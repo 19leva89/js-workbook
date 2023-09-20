@@ -23,3 +23,5 @@ console.timeEnd(counterLabel);
 console.countReset(counterLabel);
 
 console.count(counterLabel);
+
+console.clear();
