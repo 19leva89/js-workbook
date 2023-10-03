@@ -387,3 +387,37 @@ handler.login("user", "password");					// Вхід заборонено
 // =========================================================
 // МІСТ
 // =========================================================
+class Users {
+	constructor(name, messenger) {
+		this.name = name;
+		this.messenger = messenger;
+	}
+
+	sendMessage(message) {
+		const formattedMessage = this.formatMessage(message);
+		this.messenger.sendMessage(formattedMessage);
+	}
+
+	formatMessage(message) {
+		return `[${this.name}]: ${message}`;
+	}
+}
+
+class SmsMessenger {
+	static sendMessage(message) {
+		console.log(`Відправлено SMS: ${message}`);
+	}
+}
+
+class EmailMessenger {
+	static sendMessage(message) {
+		console.log(`Відправлено Email: ${message}`);
+	}
+}
+
+// Тестування
+const john = new Users("John", SmsMessenger);
+const jane = new Users("Jane", EmailMessenger);
+
+john.sendMessage("Привіт!");
+jane.sendMessage("Привіт!");
