@@ -752,3 +752,181 @@ order2.makePayment();
 // =========================================================
 // СТРАТЕГІЯ
 // =========================================================
+class ShoppingCart {
+	constructor(discountStrategy) {
+		this.discountStrategy = discountStrategy;
+		this.items = [];
+	}
+
+	addItem(item) {
+		this.items.push(item);
+	}
+
+	calculateTotalPrice() {
+		const price = this.items.reduce((acc, item) => acc + item.price, 0);
+
+		return price - this.discountStrategy.calculateDiscount(price);
+	}
+}
+
+class DiscountStrategy {
+	calculateDiscount(price) {
+		return price;
+	}
+}
+
+// Стратегія знижки для нових клієнтів
+class NewCustomerDiscountStrategy extends DiscountStrategy {
+	calculateDiscount(price) {
+		return price * 0.05; 										// 5% знижка
+	}
+}
+
+// Стратегія знижки для звичайних клієнтів
+class RegularDiscountStrategy extends DiscountStrategy {
+	calculateDiscount(price) {
+		return price * 0.1; 										// 10% знижка
+	}
+}
+
+// Стратегія знижки для преміум клієнтів
+class PremiumDiscountStrategy extends DiscountStrategy {
+	calculateDiscount(price) {
+		return price * 0.2;					 						// 20% знижка
+	}
+}
+
+// Тестування
+console.log("===============================");
+
+const shoppingCart = new ShoppingCart(new RegularDiscountStrategy());
+
+shoppingCart.addItem({ name: "Product 1", price: 100 });
+shoppingCart.addItem({ name: "Product 2", price: 50 });
+
+console.log(shoppingCart.calculateTotalPrice());
+
+
+
+// =========================================================
+// ІТЕРАТОР
+// =========================================================
+class User2 {
+	constructor(name, email, password) {
+		this.name = name;
+		this.email = email;
+		this.password = password;
+	}
+}
+
+class UserGroup {
+	users = [];
+
+	addUser(user) {
+		this.users.push(user);
+	}
+}
+
+class UserIterator {
+	#users = null;
+	#currentIndex = 0;
+
+	constructor(UserGroup) {
+		this.#users = UserGroup.users;
+
+	}
+
+	#hasNext() {
+		return this.#currentIndex < this.#users.length;
+	}
+
+	// Метод, який повертає наступний елемент
+	next() {
+		if (this.#hasNext()) {
+			const name = this.#users[this.#currentIndex].name;
+			this.#currentIndex++;
+			return name;
+		}
+		return null;
+	}
+
+	list() {
+		return this.#users.map((user) => user.name).join(", ")
+	}
+}
+
+// Тестування
+console.log("===============================");
+
+const group = new UserGroup();
+group.addUser(new User2("John Doe", "john@example.com", "password1"));
+group.addUser(new User2("Jane Smith", "jane@example.com", "password2"));
+
+console.log(group.users.map((user) => user.name).join(", "));    			// Напряму - поганий метод, бо можно достати паролі!!!
+
+const iterator = new UserIterator(group);
+
+console.log(iterator.next());
+console.log(iterator.next());
+console.log(iterator.next());
+
+console.log(iterator.list());
+
+
+
+// =========================================================
+// МЕДІАТОР
+// =========================================================
+class User3 {
+	constructor(name, chat) {
+		this.name = name;
+		this.chat = chat;
+	}
+
+	sendMessage(message) {
+		console.log(`${this.name} відправив повідомлення ${message}`);
+		return this.chat.sendMessage(this, message);
+		// ...
+	}
+
+	// Прийняття повідомлення від іншого користувача
+	receiveMessage(user, message) {
+		console.log(`${this.name} отримав повідомлення від ${user.name}: ${message}`);
+	}
+}
+
+class Chat {
+	constructor() {
+		this.users = [];
+	}
+
+	// Додавання користувача до чату
+	addUser(user) {
+		this.users.push(user);
+	}
+
+	// Відправлення повідомлення в чат
+	sendMessage(sender, message) {
+		for (const user of this.users) {
+			if (user !== sender) {
+				user.receiveMessage(sender, message);
+			}
+		}
+	}
+}
+
+// Тестування
+console.log("===============================");
+
+const chatMediator = new Chat();
+
+const user4 = new User3("John", chatMediator);
+const user5 = new User3("Jane", chatMediator);
+const user6 = new User3("Mike", chatMediator);
+
+chatMediator.addUser(user4);
+chatMediator.addUser(user5);
+chatMediator.addUser(user6);
+
+user4.sendMessage("Привіт, всім!");
+user5.sendMessage("Hello, everybody!");
