@@ -416,8 +416,339 @@ class EmailMessenger {
 }
 
 // Тестування
+console.log("===============================");
+
 const john = new Users("John", SmsMessenger);
 const jane = new Users("Jane", EmailMessenger);
 
 john.sendMessage("Привіт!");
 jane.sendMessage("Привіт!");
+
+
+
+// =========================================================
+// КОМПОЗИТ
+// =========================================================
+class Composite {
+	comments = [];
+
+	addComment(comment) {
+		this.comments.push(comment);
+	}
+
+	removeComment(comment) {
+		const index = this.comments.indexOf(comment);
+		if (index !== -1) {
+			this.comments.splice(index, 1);
+		}
+	}
+}
+
+class Comment extends Composite {
+	constructor(text) {
+		super();
+		this.text = text;
+	}
+
+	display() {
+		console.log(`- Коментар: ${this.text}`);
+
+		for (const comment of this.comments) {
+			comment.display();
+		}
+	}
+}
+
+class Video2 extends Composite {
+	constructor(title) {
+		super();
+		this.title = title;
+	}
+
+	display() {
+		console.log(`Відео: ${this.title}`);
+
+		for (const comment of this.comments) {
+			comment.display();
+		}
+	}
+}
+
+// Тестування
+console.log("===============================");
+
+const video = new Video2("Навчальне відео");
+video.addComment(new Comment("Дуже корисне відео"));
+video.addComment(new Comment("Дякую за чудовий матеріал!"));
+
+video.comments[0].addComment(new Comment("Відповідь: Згоден!"));
+
+video.display();
+
+console.log(video.comments);
+
+
+
+// =========================================================
+// МУХА
+// =========================================================
+class Category {
+	static #categories = {};
+
+	constructor(name) {
+		this.name = name;
+	}
+
+	static create(name) {
+		if (!this.#categories[name]) {
+			this.#categories[name] = new Category(name);
+		}
+		return this.#categories[name];
+	}
+}
+
+class Product {
+	constructor(name, category) {
+		this.name = name;
+		this.category = category;
+	}
+
+	display() {
+		console.log(`Product: ${this.name}, Category: ${this.category.name}`)
+	}
+}
+
+// Тестування
+console.log("===============================");
+
+const electronics = Category.create("Electronics");
+const books = Category.create("Books");
+const electronics2 = Category.create("Electronics");
+
+console.log(electronics, books, electronics2);
+console.log(electronics === electronics2);											// true
+
+const product1 = new Product("Laptop", electronics);
+const product2 = new Product("Headphones", electronics);
+const product3 = new Product("Book Title", books);
+const product4 = new Product("Smartphone", electronics2);
+
+product1.display();
+product2.display();
+product3.display();
+product4.display();
+
+console.log(product1.category === product4.category);					// true
+
+
+
+// =========================================================
+// ШАБЛОННИЙ МЕТОД
+// =========================================================
+class CoffeeMachine {
+	prepareCoffee() {
+		this.boilWater();
+		this.grindCoffeeBeans();
+		this.#brewCoffee();
+		this.pourIntoCup();
+		this.addIngredients();
+		this.serveCoffee();
+	}
+
+	boilWater() {
+		console.log("Boiling water...");
+	}
+
+	grindCoffeeBeans() {
+		console.log("Grinding coffee beans...");
+	}
+
+	#brewCoffee() {
+		console.log("Brewing coffee...");
+	}
+
+	pourIntoCup() {
+		console.log("Pouring coffee into cup...");
+	}
+
+	addIngredients() {
+		// Цей метод залишаэться пустим і може бути перевизначений у підказках
+	}
+
+	serveCoffee() {
+		console.log("Coffee served...");
+	}
+}
+
+class LatteMachine extends CoffeeMachine {
+	addIngredients() {
+		console.log("Adding milk to make a latte...");
+		// ....
+	}
+	// ....
+}
+
+class CapuchinoMachine extends CoffeeMachine {
+	addIngredients() {
+		console.log("Adding frothed milk and sprinkle of cocoa powder to make a cappucino...");
+		// ....
+	}
+	// ....
+}
+
+// Тестування
+console.log("===============================");
+
+const latteMachine = new LatteMachine();
+latteMachine.prepareCoffee();
+
+console.log("===============================");
+
+const capuchinoMachine = new CapuchinoMachine();
+capuchinoMachine.prepareCoffee();
+
+
+
+// =========================================================
+// ВІДВІДУВАЧ
+// =========================================================
+class TextFile {
+	constructor(name, content) {
+		this.name = name;
+		this.content = content;
+	}
+}
+
+class ImageFile {
+	constructor(name, size) {
+		this.name = name;
+		this.size = size;
+	}
+}
+
+class VideoFile {
+	constructor(name, duration) {
+		this.name = name;
+		this.duration = duration;
+	}
+}
+
+class TextEditor2 {
+	files = [];
+
+	addFile(file) {
+		this.files.push(file);
+	}
+
+	readTextFile(file) {
+		console.log(`Text file: ${file.name}, Size: ${file.content.length} characters`);
+	}
+
+	readImageFile(file) {
+		console.log(`Image file: ${file.name}, Size: ${file.size} KB`);
+	}
+
+	readVideoFile(file) {
+		console.log(`Video file: ${file.name}, Duration: ${file.duration} minutes`);
+	}
+
+	readFiles() {
+		for (const file of this.files) {
+			if (file instanceof TextFile) {
+				this.readTextFile(file);
+			} else if (file instanceof ImageFile) {
+				this.readImageFile(file);
+			} else if (file instanceof VideoFile) {
+				this.readVideoFile(file);
+			}
+		}
+	}
+}
+
+// Тестування
+console.log("===============================");
+
+const textEditor2 = new TextEditor2();
+
+const textFile = new TextFile("document.txt", "Lorem ipsum dolor sit amet.");
+const imageFile = new ImageFile("image.jpg", 1024);
+const videoFile = new VideoFile("video.mp4", 60);
+
+textEditor2.addFile(textFile);
+textEditor2.addFile(imageFile);
+textEditor2.addFile(videoFile);
+
+console.log(textEditor2);
+
+textEditor2.readFiles();
+
+
+
+// =========================================================
+// АДАПТЕР
+// =========================================================
+
+// Система електронних платежів з власним API
+class ElectronicPaymentSystem {
+	makePayment(amount) {
+		const convertedAmount = this.convertAmount(amount);
+		console.log(`Making electronic payment: $${convertedAmount}`);
+	}
+
+	convertAmount(amount) {
+		// Логіка конвертації суми платежу
+		return amount * 1.2; // Припустимо, що потрібна конвертація у відсотках
+	}
+}
+
+class OtherPaymentSystem {
+	submit(amount) {
+		console.log(`Submiting payment request: $${amount}`);
+	}
+}
+
+class PaymentAdapter {
+	constructor(paymentSystem) {
+		this.paymentSystem = paymentSystem;
+	}
+
+	makePayment(amount) {
+		const convertedAmount = this.convertAmount(amount);
+		this.paymentSystem.submit(convertedAmount);
+	}
+
+	convertAmount(amount) {
+		return amount * 1.2;
+	}
+}
+
+class Order {
+	constructor(amount) {
+		this.amount = amount;
+
+		if (amount < 100) {
+			this.paymentSystem = new PaymentAdapter(new OtherPaymentSystem());
+		} else {
+			this.paymentSystem = new ElectronicPaymentSystem();
+		}
+	}
+
+	makePayment() {
+		return this.paymentSystem.makePayment(this.amount);
+	}
+}
+
+// Тестування
+console.log("===============================");
+
+const order1 = new Order(1000);
+order1.makePayment();
+
+const order2 = new Order(10);
+order2.makePayment();
+
+
+
+// =========================================================
+// СТРАТЕГІЯ
+// =========================================================
